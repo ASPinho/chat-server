@@ -15,5 +15,9 @@ public class List implements Command{
     @Override
     public void execute() {
 
+        for (ChatServer.ClientHandler handler : server.getClientHandlerList()){
+
+            this.handler.send(handler.getAlias());
+        }
     }
 }

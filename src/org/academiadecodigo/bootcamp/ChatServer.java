@@ -71,12 +71,14 @@ public class ChatServer {
             System.out.println("Accepted connection from: " + getAddress(clientSocket));
 
             fixedPool.submit(clientHandler);
+
+
         }
 
 
     }
 
-    private void broadcast(String message) {
+    public void broadcast(String message) {
 
         for (ClientHandler clientHandler : clientHandlerList) {
 
@@ -85,8 +87,13 @@ public class ChatServer {
         }
     }
 
-    private void removeHandler(ClientHandler handler) {
+
+    public void removeHandler(ClientHandler handler) {
         clientHandlerList.remove(handler);
+    }
+
+    public LinkedList<ClientHandler> getClientHandlerList() {
+        return clientHandlerList;
     }
 
     private String getAddress(Socket socket) {
@@ -112,12 +119,12 @@ public class ChatServer {
             this.server = server;
             streamStarter();
             commandListStarter();
+            askForAlias();
         }
 
         @Override
         public void run() {
 
-            askForAlias();
 
             listenToClient();
 
@@ -132,6 +139,8 @@ public class ChatServer {
             }
 
             clientOut.println("Name accepted.");
+
+            broadcast(alias + " has entered the server.");
 
             notifyAll();
         }
@@ -167,10 +176,10 @@ public class ChatServer {
 
                 }
 
-                server.broadcast(alias + ": " + message);
+                broadcast(alias + ": " + message);
             }
 
-            server.removeHandler(this);
+            removeHandler(this);
 
         }
 
@@ -202,18 +211,14 @@ public class ChatServer {
             return alias;
         }
 
-        void send(String message) {
+        public void send(String message) {
 
             clientOut.println(message);
 
         }
 
-        private void close() {
-            try {
-                clientSocket.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+        public Socket getClientSocket() {
+            return clientSocket;
         }
     }
 

@@ -2,6 +2,8 @@ package org.academiadecodigo.bootcamp.commands;
 
 import org.academiadecodigo.bootcamp.ChatServer;
 
+import java.io.IOException;
+
 public class Quit implements Command{
 
     private ChatServer server;
@@ -14,6 +16,18 @@ public class Quit implements Command{
 
     @Override
     public void execute() {
+
+        try {
+            handler.getClientSocket().close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        server.removeHandler(handler);
+
+        for (ChatServer.ClientHandler handler : server.getClientHandlerList()){
+            handler.send(this.handler.getAlias() + " has left the server.");
+        }
 
     }
 }
