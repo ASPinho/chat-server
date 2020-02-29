@@ -13,7 +13,22 @@ public class Whisper implements Command{
     }
 
     @Override
-    public void execute() {
+    public void execute(String message) {
 
+        String[] splitMessage = message.split(" ");
+
+        String messageOut = message.substring(message.indexOf(" ", message.indexOf(" ") + 1));
+
+        if (splitMessage.length < 3){
+            handler.send(getUsageMessage());
+            return;
+        }
+
+        server.getClientHandlerList().get(splitMessage[1]).send(handler.getAlias() + ":" + messageOut);
+    }
+
+    @Override
+    public String getUsageMessage() {
+        return "[USAGE] /w Alias Message";
     }
 }

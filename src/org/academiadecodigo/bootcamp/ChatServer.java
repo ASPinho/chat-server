@@ -5,6 +5,8 @@ import org.academiadecodigo.bootcamp.commands.*;
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Hashtable;
 import java.util.LinkedList;
 import java.util.concurrent.ConcurrentHashMap;
@@ -19,7 +21,7 @@ public class ChatServer {
     private BufferedReader serverIn = new BufferedReader(new InputStreamReader(System.in));
     private BufferedWriter serverOut;
 
-    private LinkedList<ClientHandler> clientHandlerList;
+    private ConcurrentHashMap<String, ClientHandler> clientHandlerList;
     private ExecutorService fixedPool;
 
 
@@ -47,7 +49,7 @@ public class ChatServer {
             e.printStackTrace();
         }
 
-        clientHandlerList = new LinkedList<>();
+        clientHandlerList = new ConcurrentHashMap<>();
         fixedPool = Executors.newFixedThreadPool(1000);
 
     }
@@ -64,13 +66,13 @@ public class ChatServer {
                 e.printStackTrace();
             }
 
-            ClientHandler clientHandler = new ClientHandler(clientSocket, this);
-
-            clientHandlerList.offer(clientHandler);
-
             System.out.println("Accepted connection from: " + getAddress(clientSocket));
 
+            ClientHandler clientHandler = new ClientHandler(clientSocket, this);
+
             fixedPool.submit(clientHandler);
+
+            clientHandlerList.put(clientHandler.getAlias(), clientHandler);
 
 
         }
@@ -80,19 +82,21 @@ public class ChatServer {
 
     public void broadcast(String message) {
 
-        for (ClientHandler clientHandler : clientHandlerList) {
+        for (String alias : clientHandlerList.keySet()) {
 
-            clientHandler.send(message);
+            ClientHandler handler = clientHandlerList.get(alias);
+
+            handler.send(message);
 
         }
     }
 
 
-    public void removeHandler(ClientHandler handler) {
-        clientHandlerList.remove(handler);
+    public void removeHandler(String alias) {
+        clientHandlerList.remove(alias);
     }
 
-    public LinkedList<ClientHandler> getClientHandlerList() {
+    public ConcurrentHashMap<String, ClientHandler> getClientHandlerList() {
         return clientHandlerList;
     }
 
@@ -120,6 +124,7 @@ public class ChatServer {
             streamStarter();
             commandListStarter();
             askForAlias();
+            broadcast(alias + " has entered the server.");
         }
 
         @Override
@@ -130,7 +135,7 @@ public class ChatServer {
 
         }
 
-        private synchronized void askForAlias() {
+        public synchronized void askForAlias() {
             try {
                 clientOut.println("Pick an alias: ");
                 alias = clientIn.readLine();
@@ -140,7 +145,6 @@ public class ChatServer {
 
             clientOut.println("Name accepted.");
 
-            broadcast(alias + " has entered the server.");
 
             notifyAll();
         }
@@ -150,15 +154,20 @@ public class ChatServer {
             while (!clientSocket.isClosed()) {
 
                 String message = null;
+                String messageCommand = "";
+
                 try {
 
                     message = clientIn.readLine();
+
+                    messageCommand = message.split(" ")[0];
 
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
 
                 if (message == null) {
+
                     try {
 
                         clientSocket.close();
@@ -169,17 +178,16 @@ public class ChatServer {
                     break;
                 }
 
-                if (commandlist.containsKey(message)){
+                if (commandlist.containsKey(messageCommand)){
 
-                    commandlist.get(message).execute();
+                    commandlist.get(messageCommand).execute(message);
                     continue;
-
                 }
 
                 broadcast(alias + ": " + message);
             }
 
-            removeHandler(this);
+            removeHandler(alias);
 
         }
 
@@ -217,8 +225,23 @@ public class ChatServer {
 
         }
 
+        public void getKicked(){
+            try {
+
+                clientSocket.close();
+
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            server.removeHandler(alias);
+        }
+
         public Socket getClientSocket() {
             return clientSocket;
+        }
+
+        public ConcurrentHashMap<String, Command> getCommandlist() {
+            return commandlist;
         }
     }
 

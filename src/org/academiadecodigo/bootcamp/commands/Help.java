@@ -13,9 +13,16 @@ public class Help implements Command {
     }
 
     @Override
-    public void execute() {
+    public void execute(String message) {
 
+        for (String key : handler.getCommandlist().keySet()){
 
+            handler.send(key);
+        }
+    }
 
+    @Override
+    public String getUsageMessage() {
+        return "";
     }
 }

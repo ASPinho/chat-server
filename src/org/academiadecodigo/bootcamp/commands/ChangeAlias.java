@@ -13,7 +13,13 @@ public class ChangeAlias implements Command {
     }
 
     @Override
-    public void execute() {
+    public void execute(String message) {
 
+        handler.askForAlias();
+    }
+
+    @Override
+    public String getUsageMessage() {
+        return "";
     }
 }

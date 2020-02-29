@@ -13,11 +13,16 @@ public class List implements Command{
     }
 
     @Override
-    public void execute() {
+    public void execute(String message) {
 
-        for (ChatServer.ClientHandler handler : server.getClientHandlerList()){
+        for (String alias : server.getClientHandlerList().keySet()){
 
             this.handler.send(handler.getAlias());
         }
+    }
+
+    @Override
+    public String getUsageMessage() {
+        return "";
     }
 }

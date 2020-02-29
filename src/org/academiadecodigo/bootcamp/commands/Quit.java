@@ -15,7 +15,7 @@ public class Quit implements Command{
     }
 
     @Override
-    public void execute() {
+    public void execute(String message) {
 
         try {
             handler.getClientSocket().close();
@@ -23,11 +23,15 @@ public class Quit implements Command{
             e.printStackTrace();
         }
 
-        server.removeHandler(handler);
+        server.removeHandler(handler.getAlias());
 
-        for (ChatServer.ClientHandler handler : server.getClientHandlerList()){
+        for (String alias : server.getClientHandlerList().keySet()){
             handler.send(this.handler.getAlias() + " has left the server.");
         }
+    }
 
+    @Override
+    public String getUsageMessage() {
+        return "";
     }
 }
