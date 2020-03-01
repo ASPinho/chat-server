@@ -19,7 +19,7 @@ public class Whisper extends CommandStrategy{
         }
         String messageOut = message.substring(message.indexOf(" ", message.indexOf(" ") + 1));
 
-        server.getClientHandlerList().get(splitMessage[1]).send(handler.getAlias() + " (whisper):" + messageOut);
+        server.getHandler(splitMessage[1]).send(handler.getAlias() + " (whisper):" + messageOut);
     }
 
     @Override

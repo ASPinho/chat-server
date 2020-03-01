@@ -11,7 +11,7 @@ public class Help extends CommandStrategy {
     @Override
     public void execute(ChatServer.ClientHandler handler, String message) {
 
-        for (String key : handler.getCommandlist().keySet()){
+        for (String key : server.getCommandlist().keySet()){
 
             handler.send(key);
         }
