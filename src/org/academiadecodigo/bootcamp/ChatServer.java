@@ -15,21 +15,22 @@ import java.util.concurrent.Executors;
 
 public class ChatServer {
 
-    private int portNumber;
     private ServerSocket mySocket;
 
     private BufferedReader serverIn = new BufferedReader(new InputStreamReader(System.in));
     private BufferedWriter serverOut;
 
+    private ConcurrentHashMap<String, Command> commandlist;
     private ConcurrentHashMap<String, ClientHandler> clientHandlerList;
     private ExecutorService fixedPool;
-
 
     public static void main(String[] args) {
 
         ChatServer server = new ChatServer();
 
         server.serverBoot();
+
+        server.commandListStarter();
 
         server.listen();
 
@@ -41,7 +42,7 @@ public class ChatServer {
 
         try {
 
-            portNumber = Integer.parseInt(serverIn.readLine());
+            int portNumber = Integer.parseInt(serverIn.readLine());
             mySocket = new ServerSocket(portNumber);
             System.out.println("Server booted. Awaiting connections...");
 
@@ -80,7 +81,7 @@ public class ChatServer {
 
     }
 
-    public void broadcast(String message) {
+    private void broadcast(String message) {
 
         for (String alias : clientHandlerList.keySet()) {
 
@@ -103,7 +104,18 @@ public class ChatServer {
     private String getAddress(Socket socket) {
 
         return socket.getInetAddress().getHostName() + ":" + socket.getPort();
+    }
 
+    private void commandListStarter(){
+
+        commandlist = new ConcurrentHashMap<>();
+
+        commandlist.put("/quit", new Quit(this));
+        commandlist.put("/changealias", new ChangeAlias(this));
+        commandlist.put("/list", new List(this));
+        commandlist.put("/help", new Help(this));
+        commandlist.put("/votekick", new VoteKick(this));
+        commandlist.put("/w", new Whisper(this));
     }
 
     public class ClientHandler implements Runnable {
@@ -115,14 +127,11 @@ public class ChatServer {
         private BufferedReader clientIn;
         private PrintWriter clientOut;
 
-        private ConcurrentHashMap<String, Command> commandlist;
-
         ClientHandler(Socket socket, ChatServer server) {
 
             clientSocket = socket;
             this.server = server;
             streamStarter();
-            commandListStarter();
             askForAlias();
             broadcast(alias + " has entered the server.");
         }
@@ -144,7 +153,6 @@ public class ChatServer {
             }
 
             clientOut.println("Name accepted.");
-
             notifyAll();
         }
 
@@ -177,7 +185,7 @@ public class ChatServer {
 
                 if (commandlist.containsKey(messageCommand)){
 
-                    commandlist.get(messageCommand).execute(message);
+                    commandlist.get(messageCommand).execute(this, message);
                     continue;
                 }
                 broadcast(alias + ": " + message);
@@ -194,19 +202,6 @@ public class ChatServer {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-        }
-
-        private void commandListStarter(){
-
-            commandlist = new ConcurrentHashMap<>();
-
-            commandlist.put("/quit", new Quit(server, this));
-            commandlist.put("/changealias", new ChangeAlias(server, this));
-            commandlist.put("/list", new List(server, this));
-            commandlist.put("/help", new Help(server, this));
-            commandlist.put("/votekick", new VoteKick(server, this));
-            commandlist.put("/w", new Whisper(server, this));
-
         }
 
         public String getAlias() {

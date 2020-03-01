@@ -4,18 +4,14 @@ import org.academiadecodigo.bootcamp.ChatServer;
 
 import java.io.IOException;
 
-public class Quit implements Command{
+public class Quit extends CommandStrategy{
 
-    private ChatServer server;
-    private ChatServer.ClientHandler handler;
-
-    public Quit(ChatServer server, ChatServer.ClientHandler handler){
-        this.server = server;
-        this.handler = handler;
+    public Quit(ChatServer server){
+        super(server);
     }
 
     @Override
-    public void execute(String message) {
+    public void execute(ChatServer.ClientHandler handler, String message) {
 
         try {
             handler.getClientSocket().close();
@@ -26,7 +22,7 @@ public class Quit implements Command{
         server.removeHandler(handler.getAlias());
 
         for (String alias : server.getClientHandlerList().keySet()){
-            handler.send(this.handler.getAlias() + " has left the server.");
+            handler.send(handler.getAlias() + " has left the server.");
         }
     }
 

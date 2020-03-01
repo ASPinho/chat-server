@@ -2,18 +2,14 @@ package org.academiadecodigo.bootcamp.commands;
 
 import org.academiadecodigo.bootcamp.ChatServer;
 
-public class Help implements Command {
+public class Help extends CommandStrategy {
 
-    private ChatServer server;
-    private ChatServer.ClientHandler handler;
-
-    public Help(ChatServer server, ChatServer.ClientHandler handler){
-        this.server = server;
-        this.handler = handler;
+    public Help(ChatServer server){
+        super(server);
     }
 
     @Override
-    public void execute(String message) {
+    public void execute(ChatServer.ClientHandler handler, String message) {
 
         for (String key : handler.getCommandlist().keySet()){
 

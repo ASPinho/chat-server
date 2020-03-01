@@ -2,18 +2,14 @@ package org.academiadecodigo.bootcamp.commands;
 
 import org.academiadecodigo.bootcamp.ChatServer;
 
-public class ChangeAlias implements Command {
+public class ChangeAlias extends CommandStrategy {
 
-    private ChatServer server;
-    private ChatServer.ClientHandler handler;
-
-    public ChangeAlias(ChatServer server, ChatServer.ClientHandler handler){
-        this.server = server;
-        this.handler = handler;
+    public ChangeAlias(ChatServer server){
+       super(server);
     }
 
     @Override
-    public void execute(String message) {
+    public void execute(ChatServer.ClientHandler handler, String message) {
 
         handler.askForAlias();
     }

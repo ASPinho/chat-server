@@ -2,22 +2,18 @@ package org.academiadecodigo.bootcamp.commands;
 
 import org.academiadecodigo.bootcamp.ChatServer;
 
-public class List implements Command{
+public class List extends CommandStrategy{
 
-    private ChatServer server;
-    private ChatServer.ClientHandler handler;
-
-    public List(ChatServer server, ChatServer.ClientHandler handler){
-        this.server = server;
-        this.handler = handler;
+    public List(ChatServer server){
+        super(server);
     }
 
     @Override
-    public void execute(String message) {
+    public void execute(ChatServer.ClientHandler handler, String message) {
 
         for (String alias : server.getClientHandlerList().keySet()){
 
-            this.handler.send(alias);
+            handler.send(alias);
         }
     }
 
