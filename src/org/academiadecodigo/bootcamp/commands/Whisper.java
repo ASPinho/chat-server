@@ -2,18 +2,14 @@ package org.academiadecodigo.bootcamp.commands;
 
 import org.academiadecodigo.bootcamp.ChatServer;
 
-public class Whisper implements Command{
+public class Whisper extends CommandStrategy{
 
-    private ChatServer server;
-    private ChatServer.ClientHandler handler;
-
-    public Whisper(ChatServer server, ChatServer.ClientHandler handler){
-        this.server = server;
-        this.handler = handler;
+    public Whisper(ChatServer server){
+        super(server);
     }
 
     @Override
-    public void execute(String message) {
+    public void execute(ChatServer.ClientHandler handler, String message) {
 
         String[] splitMessage = message.split(" ");
 

@@ -4,18 +4,14 @@ import org.academiadecodigo.bootcamp.ChatServer;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class VoteKick implements Command{
+public class VoteKick extends CommandStrategy{
 
-    private ChatServer server;
-    private ChatServer.ClientHandler handler;
-
-    public VoteKick(ChatServer server, ChatServer.ClientHandler handler){
-        this.server = server;
-        this.handler = handler;
+    public VoteKick(ChatServer server){
+        super(server);
     }
 
     @Override
-    public void execute(String message) {
+    public void execute(ChatServer.ClientHandler handler, String message) {
 
         AtomicInteger votes = new AtomicInteger(1);
 
@@ -24,7 +20,7 @@ public class VoteKick implements Command{
         String aliasToKick = message.split(" ")[1];
 
         ChatServer.ClientHandler handlerToKick = server.getClientHandlerList().get(aliasToKick);
-        
+
         votes.incrementAndGet();
 
         if(votes.equals(votesToPass)){
