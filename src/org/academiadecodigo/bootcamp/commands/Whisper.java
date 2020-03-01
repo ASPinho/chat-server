@@ -17,14 +17,13 @@ public class Whisper implements Command{
 
         String[] splitMessage = message.split(" ");
 
-        String messageOut = message.substring(message.indexOf(" ", message.indexOf(" ") + 1));
-
         if (splitMessage.length < 3){
             handler.send(getUsageMessage());
             return;
         }
+        String messageOut = message.substring(message.indexOf(" ", message.indexOf(" ") + 1));
 
-        server.getClientHandlerList().get(splitMessage[1]).send(handler.getAlias() + ":" + messageOut);
+        server.getClientHandlerList().get(splitMessage[1]).send(handler.getAlias() + " (whisper):" + messageOut);
     }
 
     @Override

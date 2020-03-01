@@ -130,12 +130,12 @@ public class ChatServer {
         @Override
         public void run() {
 
-
             listenToClient();
-
         }
 
         public synchronized void askForAlias() {
+            clientOut.println("Welcome to HigherArki's Server!");
+
             try {
                 clientOut.println("Pick an alias: ");
                 alias = clientIn.readLine();
@@ -144,7 +144,6 @@ public class ChatServer {
             }
 
             clientOut.println("Name accepted.");
-
 
             notifyAll();
         }
@@ -159,7 +158,6 @@ public class ChatServer {
                 try {
 
                     message = clientIn.readLine();
-
                     messageCommand = message.split(" ")[0];
 
                 } catch (IOException e) {
@@ -167,7 +165,6 @@ public class ChatServer {
                 }
 
                 if (message == null) {
-
                     try {
 
                         clientSocket.close();
@@ -183,12 +180,9 @@ public class ChatServer {
                     commandlist.get(messageCommand).execute(message);
                     continue;
                 }
-
                 broadcast(alias + ": " + message);
             }
-
             removeHandler(alias);
-
         }
 
         private void streamStarter() {

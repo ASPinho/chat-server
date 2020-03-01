@@ -17,7 +17,7 @@ public class List implements Command{
 
         for (String alias : server.getClientHandlerList().keySet()){
 
-            this.handler.send(handler.getAlias());
+            this.handler.send(alias);
         }
     }
 
