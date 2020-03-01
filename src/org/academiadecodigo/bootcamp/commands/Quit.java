@@ -21,9 +21,8 @@ public class Quit extends CommandStrategy{
 
         server.removeHandler(handler.getAlias());
 
-        for (String alias : server.getClientHandlerList().keySet()){
-            handler.send(handler.getAlias() + " has left the server.");
-        }
+        server.broadcast(handler.getAlias() + " has left the server.");
+
     }
 
     @Override

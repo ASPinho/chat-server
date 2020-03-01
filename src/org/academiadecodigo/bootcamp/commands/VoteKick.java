@@ -15,11 +15,11 @@ public class VoteKick extends CommandStrategy{
 
         AtomicInteger votes = new AtomicInteger(1);
 
-        AtomicInteger votesToPass = new AtomicInteger(server.getClientHandlerList().size() / 2);
+        AtomicInteger votesToPass = new AtomicInteger(server.getHandlerListSize() / 2);
 
         String aliasToKick = message.split(" ")[1];
 
-        ChatServer.ClientHandler handlerToKick = server.getClientHandlerList().get(aliasToKick);
+        ChatServer.ClientHandler handlerToKick = server.getHandler(aliasToKick);
 
         votes.incrementAndGet();
 
@@ -29,7 +29,6 @@ public class VoteKick extends CommandStrategy{
 
             server.removeHandler(aliasToKick);
         }
-
     }
 
     @Override

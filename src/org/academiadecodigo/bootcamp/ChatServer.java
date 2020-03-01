@@ -33,26 +33,6 @@ public class ChatServer {
         server.commandListStarter();
 
         server.listen();
-
-    }
-
-    private void serverBoot() {
-
-        System.out.print("Port to open: ");
-
-        try {
-
-            int portNumber = Integer.parseInt(serverIn.readLine());
-            mySocket = new ServerSocket(portNumber);
-            System.out.println("Server booted. Awaiting connections...");
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        clientHandlerList = new ConcurrentHashMap<>();
-        fixedPool = Executors.newFixedThreadPool(1000);
-
     }
 
     private void listen() {
@@ -74,14 +54,10 @@ public class ChatServer {
             fixedPool.submit(clientHandler);
 
             clientHandlerList.put(clientHandler.getAlias(), clientHandler);
-
-
         }
-
-
     }
 
-    private void broadcast(String message) {
+    public void broadcast(String message) {
 
         for (String alias : clientHandlerList.keySet()) {
 
@@ -92,9 +68,16 @@ public class ChatServer {
         }
     }
 
-
     public void removeHandler(String alias) {
         clientHandlerList.remove(alias);
+    }
+
+    public ClientHandler getHandler(String alias){
+        return clientHandlerList.get(alias);
+    }
+
+    public int getHandlerListSize(){
+        return clientHandlerList.size();
     }
 
     public ConcurrentHashMap<String, ClientHandler> getClientHandlerList() {
@@ -104,6 +87,10 @@ public class ChatServer {
     private String getAddress(Socket socket) {
 
         return socket.getInetAddress().getHostName() + ":" + socket.getPort();
+    }
+
+    public ConcurrentHashMap<String, Command> getCommandlist() {
+        return commandlist;
     }
 
     private void commandListStarter(){
@@ -116,6 +103,25 @@ public class ChatServer {
         commandlist.put("/help", new Help(this));
         commandlist.put("/votekick", new VoteKick(this));
         commandlist.put("/w", new Whisper(this));
+    }
+
+    private void serverBoot() {
+
+        System.out.print("Port to open: ");
+
+        try {
+
+            int portNumber = Integer.parseInt(serverIn.readLine());
+            mySocket = new ServerSocket(portNumber);
+            System.out.println("Server booted. Awaiting connections...");
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        clientHandlerList = new ConcurrentHashMap<>();
+        fixedPool = Executors.newFixedThreadPool(1000);
+
     }
 
     public class ClientHandler implements Runnable {
@@ -228,11 +234,5 @@ public class ChatServer {
         public Socket getClientSocket() {
             return clientSocket;
         }
-
-        public ConcurrentHashMap<String, Command> getCommandlist() {
-            return commandlist;
-        }
     }
-
-
 }
