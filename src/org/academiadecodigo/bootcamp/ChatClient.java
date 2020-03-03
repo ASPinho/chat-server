@@ -34,7 +34,7 @@ public class ChatClient {
             client.getServerInput();
         }
 
-        System.exit(1);
+        System.exit(0);
 
     }
 

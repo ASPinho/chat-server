@@ -22,6 +22,7 @@ public class ChatServer {
 
     private ConcurrentHashMap<String, Command> commandlist;
     private ConcurrentHashMap<String, ClientHandler> clientHandlerList;
+    private ConcurrentHashMap<String, ConcurrentHashMap<String, ClientHandler>> groupList;
     private ExecutorService fixedPool;
 
     public static void main(String[] args) {
@@ -93,6 +94,15 @@ public class ChatServer {
         return commandlist;
     }
 
+    public boolean groupExists(String groupname){
+
+        return groupList.containsKey(groupname);
+    }
+
+    public void newGroup(String groupname, ClientHandler handler){
+        groupList.put(groupname, new ConcurrentHashMap<>());
+    }
+
     private void commandListStarter(){
 
         commandlist = new ConcurrentHashMap<>();
@@ -103,6 +113,7 @@ public class ChatServer {
         commandlist.put("/help", new Help(this));
         commandlist.put("/votekick", new VoteKick(this));
         commandlist.put("/w", new Whisper(this));
+        commandlist.put("/group", new Group(this));
     }
 
     private void serverBoot() {
@@ -120,6 +131,7 @@ public class ChatServer {
         }
 
         clientHandlerList = new ConcurrentHashMap<>();
+        groupList = new ConcurrentHashMap<>();
         fixedPool = Executors.newFixedThreadPool(1000);
 
     }
